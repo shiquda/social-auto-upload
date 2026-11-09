@@ -7,6 +7,15 @@
 
 ## For Humans
 
+### 2026-11-09 本地安装：抖音人工预填
+
+已在现有`/Users/jim/repo/social-auto-upload`加入`upload-video --prepare-only`，
+并通过`uv pip install --python .venv/bin/python3 --no-deps -e .`覆盖可编辑安装，
+保留现有依赖、配置和账号文件。Video工作流默认`--prepare-only --headed`，
+由用户在浏览器检查、修改并亲自发布；其他平台行为不变。该修改尚未提交到上游，
+后续更新代码时须保留本地改动。具体模式与进程生命周期见`docs/CLI.md`。
+
+
 ### 1. 拉取最新代码
 
 ```bash

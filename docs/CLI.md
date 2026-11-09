@@ -111,9 +111,19 @@ sau zhihu upload-video --account creator --file videos/demo.mp4 --title "知乎�
 sau douyin login --account <account_name>
 sau douyin login --account <account_name> --headless
 sau douyin check --account <account_name>
-sau douyin upload-video --account <account_name> --file videos/demo.mp4 --title "示例标题" --desc "示例简介" --tags 运动,训练
+sau douyin upload-video --account <account_name> --file videos/demo.mp4 --title "示例标题" --desc "示例简介" --tags 运动,训练 --prepare-only --headed
 sau douyin upload-note --account <account_name> --images videos/1.png videos/2.png --title "图文标题" --note "图文示例" --tags 图文,测试
 ```
+
+抖音视频工作流默认使用`--prepare-only --headed`：上传和预填完成后停止自动操作，
+保留可见浏览器供用户修改标题、简介、话题及封面并亲自点击发布。没有超时自动提交。
+保持CLI运行，关闭上传页或浏览器后命令退出；预填完成或退出不代表已发布，
+也不保证平台保存草稿。此选项仅支持抖音视频，不适用于图文或其他平台。
+
+CLI保持兼容：省略`--prepare-only`仍会自动发布，单独`--headed`不阻止提交。
+仅用户明确要求程序自动提交时才可省略该选项。`--prepare-only`强制使用可见浏览器，
+即使同时传入`--headless`也不会隐藏窗口。
+
 
 抖音短信验证码补充说明：
 

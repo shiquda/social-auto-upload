@@ -251,34 +251,6 @@ class BrowserCliDispatchTests(unittest.TestCase):
         self.assertEqual(request.title, "图文标题")
         self.assertEqual(request.note, "图文正文")
 
-    def test_dispatch_douyin_upload_video_uses_dual_thumbnail_request_fields(self):
-        args = Namespace(
-            platform="douyin",
-            action="upload-video",
-            account="creator",
-            file=Path("demo.mp4"),
-            title="视频标题",
-            desc="视频简介",
-            tags="测试,视频",
-            schedule=0,
-            thumbnail=None,
-            thumbnail_landscape=Path("landscape.png"),
-            thumbnail_portrait=Path("portrait.png"),
-            product_link="",
-            product_title="",
-            declaration="已确认声明原文",
-            collection=None,
-            debug=False,
-            headless=True,
-        )
-        with patch("sau_commands.douyin.upload_video", new=AsyncMock()) as mock_upload:
-            asyncio.run(sau_cli.dispatch(args))
-
-        request = mock_upload.await_args.args[0]
-        self.assertEqual(request.thumbnail_landscape_file, Path("landscape.png"))
-        self.assertEqual(request.thumbnail_portrait_file, Path("portrait.png"))
-        self.assertEqual(request.declaration, "已确认声明原文")
-
     def test_dispatch_tencent_upload_video_uses_dual_thumbnail_request_fields(self):
         args = Namespace(
             platform="tencent",

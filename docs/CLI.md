@@ -115,6 +115,26 @@ sau douyin upload-video --account <account_name> --file videos/demo.mp4 --title 
 sau douyin upload-note --account <account_name> --images videos/1.png videos/2.png --title "图文标题" --note "图文示例" --tags 图文,测试
 ```
 
+### 上传后人工审阅，不自动发布
+
+```bash
+sau douyin upload-video --account <account_name> --file videos/demo.mp4 \
+  --title "示例标题" --desc "示例简介" --tags 地理知识,地理科普 \
+  --prepare-only
+```
+
+`--prepare-only` 仅适用于抖音视频，强制使用可见浏览器（即使同时传入
+`--headless`）。沿用上传与预填流程，设置提供的封面、话题、声明、合集及
+定时信息后停止自动操作，不进入发布或发布失败重试流程。
+
+- 保持命令和浏览器运行，在浏览器里检查或修改标题、简介、话题与封面。
+- 发布必须由用户自行点击；等待多久都不会自动提交，也不会覆盖人工修改。
+- 关闭上传页或浏览器后命令退出；退出不代表发布成功，也不保证平台已保存草稿。
+- 用户自行发布后仍需关闭该页或窗口结束命令。最终状态以创作者中心为准。
+- 终止 CLI 进程可能关闭浏览器；此模式不是脱离 CLI 后仍存活的浏览器服务。
+- 不传 `--prepare-only` 时保持原来的自动发布行为；`--headed` 本身不阻止发布。
+
+
 抖音短信验证码补充说明：
 
 - 视频发布过程中如果触发短信二次验证，CLI 会优先读取项目根目录下的 `verify_code.txt`

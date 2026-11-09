@@ -643,6 +643,7 @@ class DouYinVideo(DouYinBaseUploader):
         debug: bool = DEBUG_MODE,
         headless: bool = LOCAL_CHROME_HEADLESS,
         declaration: str | None = None,
+        prepare_only: bool = False,
     ):
         super().__init__(
             publish_date=publish_date,
@@ -661,6 +662,9 @@ class DouYinVideo(DouYinBaseUploader):
         self.desc = desc or ""
         self.collection_name = collection_name
         self.declaration = declaration.strip() if declaration and declaration.strip() else None
+        self.prepare_only = prepare_only
+        if prepare_only:
+            self.headless = False
 
     async def apply_self_declaration(self, page: Page) -> None:
         if not self.declaration:
@@ -968,6 +972,21 @@ class DouYinVideo(DouYinBaseUploader):
             douyin_logger.warning(_msg("⚠️", "封面弹窗未能关闭，可能挡住自主声明/发布"))
 
 
+    async def _wait_for_manual_close(self, page, browser) -> None:
+        closed = asyncio.Event()
+
+        def on_close(*_):
+            closed.set()
+
+        page.on("close", on_close)
+        browser.on("disconnected", on_close)
+        try:
+            if not page.is_closed() and browser.is_connected():
+                await closed.wait()
+        finally:
+            page.remove_listener("close", on_close)
+            browser.remove_listener("disconnected", on_close)
+
     async def upload(self, playwright: Playwright) -> None:
         douyin_logger.info(_msg("🧍", "小人先检查 cookie、视频文件、封面和发布时间"))
         await self.validate_upload_args()
@@ -1066,6 +1085,19 @@ class DouYinVideo(DouYinBaseUploader):
 
         if self.publish_strategy == DOUYIN_PUBLISH_STRATEGY_SCHEDULED and self.publish_date != 0:
             await self.set_schedule_time_douyin(page, self.publish_date)
+
+        if self.prepare_only:
+            await context.storage_state(path=self.account_file)
+            douyin_logger.info(
+                "预填完成，未提交。请在浏览器检查并修改标题、简介、话题和封面；"
+                "如需发布，请自行点击发布。关闭此页面或浏览器结束，程序不会自动提交。"
+            )
+            try:
+                await self._wait_for_manual_close(page, browser)
+            finally:
+                if browser.is_connected():
+                    await browser.close()
+            return
 
         sms_prompt_logged = False
         while True:
